@@ -1,0 +1,155 @@
+@using PagedList.Mvc;
+@model CustomScafollder.Models.CustomerViewModel
+
+
+
+
+@* This partial view defines form fields that will appear when creating and editing entities *@
+
+
+@using (Html.BeginForm()) {
+    @Html.ValidationSummary(true)
+    <div class="panel panel-default">
+        <div class="panel-body">
+			 <div class="row">
+				 <label class="control-label col-sm-2">
+					@Html.LabelFor(model => model.IdFilter)
+				</label>
+				<div class="col-md-6 col-lg-6">
+					@Html.TextBoxFor(model => model.IdFilter, new { @class = "form-control" })
+					@Html.ValidationMessageFor(model => model.IdFilter)
+				</div>
+			</div>
+
+
+			 <div class="row">
+				 <label class="control-label col-sm-2">
+					@Html.LabelFor(model => model.NameFilter)
+				</label>
+				<div class="col-md-6 col-lg-6">
+					@Html.TextBoxFor(model => model.NameFilter, new { @class = "form-control" })
+					@Html.ValidationMessageFor(model => model.NameFilter)
+				</div>
+			</div>
+
+
+		<div>@Html.HiddenFor(model => model.Page)</div>
+
+			 <div class="row">
+				 <label class="control-label col-sm-2">
+					@Html.LabelFor(model => model.PageSize)
+				</label>
+				<div class="col-md-6 col-lg-6">
+					@Html.TextBoxFor(model => model.PageSize, new { @class = "form-control" })
+					@Html.ValidationMessageFor(model => model.PageSize)
+				</div>
+			</div>
+
+		<div>@Html.HiddenFor(model => model.SortOrder)</div>
+
+
+		 </div>
+		 <div class="panel-footer">
+
+            <input type="submit" value="Filter" class="btn btn-primary" />
+        </div>
+    </div>
+
+    
+}
+
+Customer
+<div>
+    Page @(Model.Records.PageCount < Model.Records.PageNumber ? 0 : Model.Records.PageNumber) of @Model.Records.PageCount    
+</div>
+<div>
+    Total Records: @Model.Records.TotalItemCount
+    @Html.PagedListPager(Model.Records, page => Url.Action("PageList",
+    new { page}))
+    
+
+</div>
+<table class="table">
+<tr class="sorting">
+		<th> 
+		@Html.ActionLink("Id", "PageList",new {sortorder=@Model.IdSort}) 
+	
+	</th>
+		<th> 
+		@Html.ActionLink("Name", "PageList",new {sortorder=@Model.NameSort}) 
+	
+	</th>
+		<th> 
+		Company
+	
+	</th>
+	</tr>
+
+	@foreach (var item in Model.Records) 
+	{
+	 <tr>
+		<td>@item.Id</td>
+		<td>@item.Name</td>
+		<td>@(item.Company == null ? "None" : item.Company.Name)</td>
+	</tr>
+	}
+
+
+</table>
+
+
+
+
+
+@section scripts
+{
+    <script>
+        $(function () {
+		//paging
+            $(".pagination a").click(function (e) {
+                // get the url of the page link
+                var url = this.href;
+
+                // update a hidden field inside the search form with this value
+                var qs = getUrlVars(url);
+                $('#Page').val(qs.page);
+
+                // trigger the search
+                $("form input[type=submit]").click();
+                return false;
+            });
+
+			//sorting
+			 $(".sorting a").click(function (e) {
+                // get the url of the page link
+                var url = this.href;
+
+                // update a hidden field inside the search form with this value
+                var qs = getUrlVars(url);
+                $('#SortOrder').val(qs.sortorder);
+
+                // trigger the search
+                $("form input[type=submit]").click();
+                return false;
+            });
+			//on submit clear filter
+			 $("input[type=submit]").click(function (e) {
+              return true;
+            });
+        });
+
+	function getUrlVars(url) {
+		var vars = [], hash;
+		var hashes = url.slice(url.indexOf('?') + 1).split('&');
+		for (var i = 0; i < hashes.length; i++) {
+		hash = hashes[i].split('=');
+		vars.push(hash[0]);
+		vars[hash[0]] = hash[1];
+		}
+		return vars;
+	}
+    </script>
+}
+
+
+
